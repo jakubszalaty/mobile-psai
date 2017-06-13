@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <main class="mdl-layout__content">
+        <div class="mdl-grid portfolio-max-width portfolio-contact">
+            <div class="mdl-cell mdl-cell--12-col mdl-card mdl-shadow--4dp">
+                <div class="mdl-card__media">
+                    <img class="article-image" src="/assets/blog/images/contact-image.jpg" border="0" alt="">
+                </div>
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Tabelka</h2>
+                </div>
+                <div class="mdl-card__supporting-text center-div">
+
+                    <p>
+                        <button id="get-data" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                            Pobierz
+                        </button>
+                    </p>
+
+                    <table id="table" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th class="mdl-data-table__cell--non-numeric">Tytuł</th>
+                                <th class="mdl-data-table__cell--non-numeric">Zawartość</th>
+                                <th class="mdl-data-table__cell--non-numeric">Data utworzenia</th>
+                                <th class="mdl-data-table__cell--non-numeric">Typ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>Brak danych do wyświetlenia</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+
+    (function(){
+
+        const makeXMLHttpRequest = (method, url) => {
+            return new Promise((resolve, reject) => {
+                const req = new XMLHttpRequest()
+                req.open(method, url, true)
+                req.onload =  (e) => {
+                    if (req.readyState === 4) {
+                        if (req.status === 200) {
+                            return resolve(req)
+                        } else {
+                            return reject(req.statusText)
+                        }
+                    }
+                }
+                req.onerror = (e) => {
+                    return reject(req.statusText)
+                }
+                req.send(null)
+            })
+        }
+
+        const getRow = (obj) => {
+            return `<tr>
+                <td>${obj.id}</td>
+                <td>${obj.title}</td>
+                <td>${obj.content}</td>
+                <td>${obj.createDate}</td>
+                <td>${obj.type}</td>
+            </tr>`
+
+        }
+
+        const getData = async () => {
+            const tbody = document.querySelector('#table tbody')
+
+            const requestJson = await makeXMLHttpRequest('GET', '/news_list.json')
+            console.log(requestJson.responseText)
+
+            const data = JSON.parse(requestJson.responseText)
+            const rows = data.map(getRow)
+
+            tbody.innerHTML = rows.join('')
+
+        }
+
+        document.querySelector('#get-data').addEventListener('click', getData)
+
+    })()
+
+</script>
+{% endblock %}
+
